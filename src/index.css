@@ -1,0 +1,312 @@
+/* Import Google Fonts for hip-hop typography */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&family=Oswald:wght@300;400;500;600;700&family=Russo+One&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 0 0% 0%;
+    --primary-foreground: 45 100% 51%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 25 95% 53%;
+    
+    /* Hip-hop themed colors */
+    --hip-hop-gold: 45 100% 51%;
+    --hip-hop-red: 0 100% 50%;
+    --hip-hop-dark: 0 0% 8%;
+    --hip-hop-gray: 0 0% 20%;
+    --hip-hop-purple: 280 100% 70%;
+    --hip-hop-cyan: 180 100% 50%;
+    --hip-hop-green: 120 100% 40%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--hip-hop-dark)), hsl(var(--hip-hop-gray)));
+    --gradient-gold: linear-gradient(135deg, hsl(var(--hip-hop-gold)), hsl(45 100% 60%));
+    --gradient-graffiti: linear-gradient(45deg, hsl(var(--hip-hop-purple)), hsl(var(--hip-hop-cyan)), hsl(var(--hip-hop-green)));
+    
+    /* Shadows */
+    --shadow-glow: 0 0 30px hsl(var(--hip-hop-gold) / 0.4);
+    --shadow-neon: 0 0 20px hsl(var(--hip-hop-purple) / 0.6);
+    --shadow-deep: 0 15px 35px hsl(var(--hip-hop-dark) / 0.8);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 45 100% 51%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 45 100% 51%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent;
+    font-family: 'Bebas Neue', cursive;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .graffiti-text {
+    background: var(--gradient-graffiti);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: 'Russo One', sans-serif;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  
+  .hip-hop-card {
+    @apply bg-card/90 backdrop-blur-sm border-2 border-yellow-500/30 rounded-lg p-3 sm:p-6 transition-all duration-300;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 20, 0.9));
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.1);
+    position: relative;
+  }
+  
+  .hip-hop-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('/images/hip_hop_graffiti_1.jpeg') center/cover;
+    opacity: 0.05;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  
+  .hip-hop-card:hover {
+    @apply border-yellow-400/60 shadow-2xl;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  .battle-timeline-item {
+    @apply relative pl-6 sm:pl-8 pb-6 sm:pb-8 border-l-4 border-yellow-500/50 last:border-l-0;
+  }
+  
+  .battle-timeline-item::before {
+    @apply absolute -left-2 sm:-left-3 top-0 w-4 h-4 sm:w-6 sm:h-6 bg-yellow-500 rounded-full border-2 sm:border-4 border-black;
+    content: '';
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  }
+  
+  .urban-hero {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(20, 20, 20, 0.8)), 
+                url('/images/hip_hop_graffiti_3.jpeg') center/cover;
+    position: relative;
+  }
+  
+  .urban-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+  }
+  
+  .neon-button {
+    @apply bg-yellow-500 text-black font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-all duration-300 text-sm sm:text-base;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+  }
+  
+  .neon-button:hover {
+    @apply bg-yellow-400;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    transform: translateY(-1px);
+  }
+  
+  .street-title {
+    font-family: 'Bebas Neue', cursive;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  @media (min-width: 640px) {
+    .street-title {
+      letter-spacing: 2px;
+    }
+  }
+  
+  .urban-subtitle {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  
+  @media (min-width: 640px) {
+    .urban-subtitle {
+      letter-spacing: 1px;
+    }
+  }
+  
+  .graffiti-bg {
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.9), rgba(20, 20, 20, 0.8)), 
+                url('/images/hip_hop_graffiti_5.jpeg') center/cover;
+    background-attachment: fixed;
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .urban-hero {
+      padding: 3rem 1rem;
+    }
+    
+    .gradient-text {
+      font-size: clamp(2rem, 8vw, 3rem);
+      line-height: 1.1;
+    }
+    
+    .hip-hop-card {
+      margin: 0 0.5rem;
+    }
+    
+    .battle-timeline-item {
+      padding-left: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+    
+    .battle-timeline-item::before {
+      left: -0.5rem;
+      width: 1rem;
+      height: 1rem;
+      border-width: 2px;
+    }
+  }
+  
+  /* Tablet optimizations */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .urban-hero {
+      padding: 4rem 2rem;
+    }
+  }
+  
+  /* Quiz text overflow fixes */
+  .quiz-question {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.4;
+  }
+
+  .quiz-option {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.3;
+  }
+
+  .quiz-explanation {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.5;
+  }
+
+  /* Responsive text sizing for quiz */
+  .quiz-question {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+  }
+  
+  .quiz-option {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+  }
+  
+  .quiz-explanation {
+    font-size: clamp(0.75rem, 1.8vw, 0.875rem);
+  }
+}
