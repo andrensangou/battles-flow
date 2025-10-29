@@ -74,12 +74,10 @@ export default function Index() {
     setSubmitMessage('');
 
     try {
-      // Validation côté client
       if (!contactForm.name || !contactForm.email || !contactForm.subject || !contactForm.message) {
         throw new Error('Tous les champs sont requis');
       }
 
-      // ✅ CORRECTION : Appel à VOTRE API Next.js sur Vercel
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
@@ -93,15 +91,14 @@ export default function Index() {
         })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de l\'envoi du message');
+      // ✅ CORRECTION : Vérifier seulement si la réponse est OK
+      if (response.ok) {
+        setSubmitMessage('✅ Message envoyé avec succès ! Nous vous répondrons bientôt.');
+        setContactForm({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error('Erreur lors de l\'envoi du message');
       }
-
-      const result = await response.json();
       
-      setSubmitMessage('✅ Message envoyé avec succès ! Nous vous répondrons bientôt.');
-      setContactForm({ name: '', email: '', subject: '', message: '' });
     } catch (error: any) {
       console.error('Erreur envoi email:', error);
       setSubmitMessage(`❌ Erreur: ${error.message || 'Veuillez réessayer.'}`);
