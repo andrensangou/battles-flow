@@ -15,7 +15,7 @@ import { SearchFilters } from "@/components/SearchFilters";
 import { SearchResults } from "@/components/SearchResults";
 import { QuizSection } from "@/components/QuizSection";
 import { YouTubePlayer } from "@/components/YouTubePlayer";
-import { supabase } from "@/integrations/supabase/client";
+
 export default function Index() {
   const [selectedBattle, setSelectedBattle] = useState<Battle | null>(null);
   const [activeTab, setActiveTab] = useState("battles");
@@ -79,20 +79,27 @@ export default function Index() {
         throw new Error('Tous les champs sont requis');
       }
 
-      // Appel à la fonction Edge Supabase
-      const { data, error } = await supabase.functions.invoke('send_contact_email_20251028_135500', {
-        body: {
+      // ✅ CORRECTION : Appel à VOTRE API Next.js sur Vercel
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           name: contactForm.name,
           email: contactForm.email,
           subject: contactForm.subject,
           message: contactForm.message
-        }
+        })
       });
 
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de l\'envoi du message');
       }
 
+      const result = await response.json();
+      
       setSubmitMessage('✅ Message envoyé avec succès ! Nous vous répondrons bientôt.');
       setContactForm({ name: '', email: '', subject: '', message: '' });
     } catch (error: any) {
@@ -280,7 +287,6 @@ export default function Index() {
               
               <QuizSection />
             </TabsContent>
-
 
             <TabsContent value="youtube" className="space-y-8">
               <div className="text-center mb-8 px-4">
