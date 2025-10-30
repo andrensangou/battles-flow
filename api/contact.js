@@ -1,5 +1,5 @@
-// api/contact.js - Version CommonJS pour compatibilité maximale
-module.exports = async (req, res) => {
+// api/contact.js - Version ES Module
+export default async (req, res) => {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
