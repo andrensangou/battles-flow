@@ -1,23 +1,17 @@
-// pages/api/contact.js - VERSION DEBUG SIMPLIFIÉE
+// pages/api/contact.js
 export default async function handler(req, res) {
-  // IMPORTANT : Définir les headers AVANT tout
+  // Headers CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Content-Type', 'application/json');
 
-  console.log('=== API CONTACT - START ===');
-  console.log('Method:', req.method);
-
-  // Handle preflight
+  // Preflight
   if (req.method === 'OPTIONS') {
-    console.log('OPTIONS request');
     return res.status(200).end();
   }
 
-  // Only POST allowed
+  // Seulement POST
   if (req.method !== 'POST') {
-    console.log('Wrong method:', req.method);
     return res.status(405).json({ 
       success: false,
       error: 'Method not allowed'
@@ -25,50 +19,57 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('Body:', req.body);
+    const { name, email, subject, message } = req.body;
 
-    // Récupérer les données
-    const { name, email, subject, message } = req.body || {};
-    
-    console.log('Parsed data:', { name, email, subject, messageLength: message?.length });
-
-    // Validation simple
+    // Validation
     if (!name || !email || !subject || !message) {
-      console.log('Missing fields');
       return res.status(400).json({ 
         success: false,
-        error: 'Tous les champs sont requis',
-        details: 'Veuillez remplir tous les champs'
+        error: 'Tous les champs sont requis'
       });
     }
 
-    // Vérifier les variables d'environnement
+    // Variables d'environnement
     const resendApiKey = process.env.RESEND_API_KEY;
     const hostingerEmail = process.env.HOSTINGER_EMAIL || 'contact@battlesflow.fr';
     const resendDomain = process.env.RESEND_DOMAIN || 'battlesflow.fr';
-    
-    console.log('Env check:', {
-      hasApiKey: !!resendApiKey,
-      apiKeyLength: resendApiKey?.length,
-      hostingerEmail,
-      resendDomain
-    });
 
     if (!resendApiKey) {
-      console.error('NO API KEY!');
       return res.status(500).json({ 
         success: false,
-        error: 'Configuration manquante',
-        details: 'RESEND_API_KEY non configurée'
+        error: 'Configuration manquante'
       });
     }
 
-    // Construction email simple
-    const fromEmail = `Battles Flow <contact@${resendDomain}>`;
-    
-    console.log('Sending email...');
-    console.log('From:', fromEmail);
-    console.log('To:', hostingerEmail);
+    // Email HTML
+    const emailBody = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+      </head>
+      <body style="font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #ffd700;">🎤 Battles Flow - Nouveau message</h1>
+          
+          <div style="background: #2a2a2a; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p><strong style="color: #ffd700;">Nom:</strong> ${name}</p>
+            <p><strong style="color: #ffd700;">Email:</strong> <a href="mailto:${email}" style="color: #4da6ff;">${email}</a></p>
+            <p><strong style="color: #ffd700;">Sujet:</strong> ${subject}</p>
+            <div style="margin-top: 20px;">
+              <strong style="color: #ffd700;">Message:</strong>
+              <div style="background: #1a1a1a; padding: 15px; border-radius: 5px; margin-top: 10px; white-space: pre-wrap;">${message}</div>
+            </div>
+          </div>
+          
+          <p style="text-align: center; color: #888; font-size: 14px;">
+            Message envoyé depuis Battles Flow<br>
+            <span style="color: #ffd700;">🎵 La référence des battles hip-hop</span>
+          </p>
+        </div>
+      </body>
+      </html>
+    `;
 
     // Envoi via Resend
     const resendResponse = await fetch('https://api.resend.com/emails', {
@@ -78,47 +79,26 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: fromEmail,
+        from: `Battles Flow <contact@${resendDomain}>`,
         to: hostingerEmail,
         subject: `[Battles Flow] ${subject}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: #fff;">
-            <h1 style="color: #ffd700;">🎤 Nouveau message - Battles Flow</h1>
-            <p><strong>Nom:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Sujet:</strong> ${subject}</p>
-            <p><strong>Message:</strong></p>
-            <p style="white-space: pre-wrap;">${message}</p>
-          </div>
-        `,
+        html: emailBody,
         reply_to: email
       })
     });
 
-    console.log('Resend status:', resendResponse.status);
-
-    const responseText = await resendResponse.text();
-    console.log('Resend response:', responseText);
-
-    let responseData;
-    try {
-      responseData = JSON.parse(responseText);
-    } catch (e) {
-      console.error('JSON parse error:', e);
-      responseData = { raw: responseText };
-    }
+    const responseData = await resendResponse.json();
 
     if (!resendResponse.ok) {
       console.error('Resend error:', responseData);
       return res.status(500).json({ 
         success: false,
-        error: 'Erreur Resend',
-        details: responseData.message || responseData.error || 'Erreur inconnue',
-        statusCode: resendResponse.status
+        error: 'Erreur lors de l\'envoi',
+        details: responseData.message || 'Erreur Resend'
       });
     }
 
-    console.log('SUCCESS! Email sent:', responseData.id);
+    console.log('Email sent successfully:', responseData.id);
 
     return res.status(200).json({ 
       success: true, 
@@ -127,16 +107,11 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('=== ERROR ===');
-    console.error('Message:', error.message);
-    console.error('Stack:', error.stack);
-    
-    // IMPORTANT : Toujours retourner du JSON
+    console.error('Error:', error);
     return res.status(500).json({ 
       success: false,
       error: 'Erreur serveur',
-      details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: error.message
     });
   }
 }
