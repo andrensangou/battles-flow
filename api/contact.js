@@ -150,7 +150,7 @@ Pour répondre: ${email}
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: `Battles Flow <contact@${resendDomain}>`,
+        from: `Battles Flow <contact@battlesflow.fr>`,
         to: [hostingerEmail],
         subject: `[Battles Flow] ${subject}`,
         html: emailHTML,
