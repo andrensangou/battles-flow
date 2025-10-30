@@ -36,13 +36,11 @@ export default function Index() {
 
   const handleViewDetails = (battle: Battle) => {
     setSelectedBattle(battle);
-    // Scroll vers le haut de la page
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToBattles = () => {
     setSelectedBattle(null);
-    // Scroll vers le haut de la page
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -51,7 +49,6 @@ export default function Index() {
     if (battle) {
       setSelectedBattle(battle);
       setActiveTab("battles");
-      // Scroll vers le haut de la page
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -68,15 +65,19 @@ export default function Index() {
     }));
   };
 
+  // ✅ FONCTION CORRIGÉE
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitMessage('');
 
     try {
+      // Validation côté client
       if (!contactForm.name || !contactForm.email || !contactForm.subject || !contactForm.message) {
         throw new Error('Tous les champs sont requis');
       }
+
+      console.log('📤 Envoi du formulaire vers /api/contact...');
 
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -91,17 +92,25 @@ export default function Index() {
         })
       });
 
-      // ✅ CORRECTION : Vérifier seulement si la réponse est OK
-      if (response.ok) {
+      console.log('📥 Réponse reçue - Status:', response.status);
+
+      // Parser la réponse JSON
+      const data = await response.json();
+      console.log('📥 Données reçues:', data);
+
+      // Vérifier si la réponse est OK
+      if (response.ok && data.success) {
         setSubmitMessage('✅ Message envoyé avec succès ! Nous vous répondrons bientôt.');
         setContactForm({ name: '', email: '', subject: '', message: '' });
       } else {
-        throw new Error('Erreur lors de l\'envoi du message');
+        // Afficher l'erreur détaillée du serveur
+        const errorMessage = data.details || data.error || 'Erreur lors de l\'envoi du message';
+        throw new Error(errorMessage);
       }
       
     } catch (error: any) {
-      console.error('Erreur envoi email:', error);
-      setSubmitMessage(`❌ Erreur: ${error.message || 'Veuillez réessayer.'}`);
+      console.error('❌ Erreur envoi email:', error);
+      setSubmitMessage(`❌ ${error.message || 'Erreur lors de l\'envoi. Veuillez réessayer.'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -130,7 +139,6 @@ export default function Index() {
                 alt="Battles Flow - Microphone Logo" 
                 className="h-20 w-auto object-contain filter drop-shadow-lg"
                 onError={(e) => {
-                  // Fallback vers une icône Lucide si l'image ne charge pas
                   e.currentTarget.style.display = 'none';
                   const fallback = document.createElement('div');
                   fallback.innerHTML = '<div class="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center"><svg class="w-10 h-10 text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3Z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/></svg></div>';
@@ -239,10 +247,8 @@ export default function Index() {
                 </p>
               </div>
 
-              {/* Système de recherche et filtres */}
               <SearchFilters battles={battles} onFilteredResults={handleFilteredResults} />
               
-              {/* Résultats de recherche */}
               <SearchResults 
                 filteredBattles={filteredBattles} 
                 totalBattles={battles.length}
@@ -295,7 +301,6 @@ export default function Index() {
                 </p>
               </div>
 
-              {/* Lecteur YouTube principal */}
               <YouTubePlayer
                 initialQuery="hip hop diss track battle"
                 autoSearch={false}
@@ -303,7 +308,6 @@ export default function Index() {
                 className="max-w-6xl mx-auto"
               />
 
-              {/* Suggestions de recherches populaires */}
               <Card className="hip-hop-card max-w-4xl mx-auto">
                 <CardHeader className="p-4">
                   <CardTitle className="text-yellow-400 street-title">
@@ -328,7 +332,6 @@ export default function Index() {
                         size="sm"
                         className="border-red-500/50 text-red-400 hover:bg-red-500/10 text-xs"
                         onClick={() => {
-                          // Cette fonctionnalité sera implémentée dans le composant YouTubePlayer
                           console.log(`Recherche: ${query}`);
                         }}
                       >
@@ -454,7 +457,6 @@ export default function Index() {
                   </CardContent>
                 </Card>
                 
-                {/* Informations supplémentaires */}
                 <Card className="hip-hop-card mt-6">
                   <CardContent className="p-6">
                     <h3 className="text-lg font-bold text-yellow-400 mb-4 street-title">
