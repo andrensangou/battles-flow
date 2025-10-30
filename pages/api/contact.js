@@ -1,4 +1,4 @@
-// pages/api/contact.js - VERSION PRODUCTION COMPLÈTE
+// pages/api/contact.js - VERSION PRODUCTION FINALE
 export default async function handler(req, res) {
   console.log('=== 🚀 API CONTACT APPELLÉE ===');
   console.log('Method:', req.method);
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
     
     if (!resendApiKey) {
       console.error('❌ RESEND_API_KEY not found in environment variables');
-      console.error('Variables disponibles:', Object.keys(process.env));
+      console.error('Variables disponibles:', Object.keys(process.env).filter(k => k.includes('RESEND')));
       return res.status(500).json({ 
         success: false,
         error: 'Configuration email manquante',
@@ -101,16 +101,22 @@ export default async function handler(req, res) {
     const hostingerEmail = process.env.HOSTINGER_EMAIL || 'contact@battlesflow.fr';
     const resendDomain = process.env.RESEND_DOMAIN;
     
-    // Déterminer l'email d'envoi
-    const fromEmail = resendDomain 
-      ? `noreply@${resendDomain}` 
-      : 'onboarding@resend.dev';
+    // ✅ CORRECTION IMPORTANTE : Format correct pour Resend
+    // Resend exige soit "Name <email@domain.com>" soit juste "email@domain.com"
+    let fromEmail;
+    if (resendDomain) {
+      // Si vous avez vérifié votre domaine sur Resend
+      fromEmail = `Battles Flow <contact@${resendDomain}>`;
+    } else {
+      // Fallback vers le domaine par défaut de Resend
+      fromEmail = 'onboarding@resend.dev';
+    }
 
     console.log('📧 Configuration email:', { 
       to: hostingerEmail, 
       from: fromEmail,
       hasDomain: !!resendDomain,
-      domain: resendDomain || 'Non défini'
+      domain: resendDomain || 'Non défini (utilise resend.dev)'
     });
 
     // ==========================================
@@ -231,20 +237,29 @@ Pour répondre: ${email}
     // ==========================================
     console.log('📤 Tentative d\'envoi via Resend API...');
     
+    const resendPayload = {
+      from: fromEmail,
+      to: [hostingerEmail],
+      subject: `[Battles Flow] ${subject}`,
+      html: emailBody,
+      text: textBody,
+      reply_to: email
+    };
+
+    console.log('📦 Payload Resend:', {
+      from: resendPayload.from,
+      to: resendPayload.to,
+      subject: resendPayload.subject,
+      reply_to: resendPayload.reply_to
+    });
+    
     const resendResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: [hostingerEmail],
-        subject: `[Battles Flow] ${subject}`,
-        html: emailBody,
-        text: textBody,
-        reply_to: email
-      })
+      body: JSON.stringify(resendPayload)
     });
 
     console.log('📨 Réponse Resend - Status:', resendResponse.status);
@@ -275,7 +290,7 @@ Pour répondre: ${email}
           errorDetails = 'Clé API Resend invalide ou expirée';
           break;
         case 403:
-          errorDetails = 'Accès refusé - Vérifiez les permissions de l\'API Resend';
+          errorDetails = 'Accès refusé - Vérifiez que votre domaine est vérifié sur Resend';
           break;
         case 422:
           errorDetails = 'Données invalides - ' + errorDetails;
