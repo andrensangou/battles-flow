@@ -1,4 +1,5 @@
 // Configuration YouTube API
+import { SmartYouTubeSearch } from './smartYouTubeSearch';
 export const YOUTUBE_CONFIG = {
   API_KEY: import.meta.env.VITE_YOUTUBE_API_KEY || 'YOUR_YOUTUBE_API_KEY',
   BASE_URL: 'https://www.googleapis.com/youtube/v3',
@@ -44,8 +45,8 @@ export class YouTubeService {
       
       // Vérifier si la clé API est configurée
       if (!this.apiKey || this.apiKey === 'YOUR_YOUTUBE_API_KEY') {
-        console.warn('Clé API YouTube non configurée, utilisation des données de fallback');
-        return this.getFallbackResults(query, maxResults);
+        console.warn('Clé API YouTube non configurée, utilisation de la recherche intelligente');
+        return this.getSmartResults(query, maxResults);
       }
 
       console.log('YouTubeService: Utilisation de l\'API YouTube avec clé:', this.apiKey.substring(0, 10) + '...');
@@ -115,8 +116,19 @@ export class YouTubeService {
       };
     } catch (error) {
       console.error('Erreur lors de la recherche YouTube:', error);
-      return this.getFallbackResults(query, maxResults);
+      return this.getSmartResults(query, maxResults);
     }
+  }
+
+  // Nouvelle méthode utilisant la recherche intelligente
+  private getSmartResults(query: string, maxResults: number): YouTubeSearchResult {
+    const result = SmartYouTubeSearch.searchTracks(query, maxResults);
+    
+    return {
+      videos: result.videos,
+      nextPageToken: undefined,
+      totalResults: result.totalResults
+    };
   }
 
   // Données de fallback en cas de problème avec l'API
