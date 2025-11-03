@@ -2,14 +2,29 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://votre-domaine.com/sitemap.xml
+Sitemap: https://battlesflow.com/sitemap.xml
 
 # Optimisations pour les moteurs de recherche
+User-agent: Googlebot
+Allow: /
 Crawl-delay: 1
 
-# Bloquer les fichiers techniques
-Disallow: /node_modules/
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Interdire l'accès aux fichiers techniques
+Disallow: /api/
+Disallow: /*.json$
 Disallow: /src/
-Disallow: /.git/
+Disallow: /node_modules/
 Disallow: /dist/
-Disallow: /build/
+
+# Autoriser les images et ressources
+Allow: /images/
+Allow: /favicon.ico
+Allow: /manifest.json
